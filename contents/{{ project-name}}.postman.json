@@ -1,0 +1,163 @@
+{% import "macros" as macros -%}
+{
+	"info": {
+		"_postman_id": "{{ uuid() }}",
+		"name": "{{ project-name }}",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "1779973"
+	},
+
+	"item": [
+{%- for application_key in applications %}
+{%- set application = applications[application_key] %}
+{%- for entity_key in application.model.entities %}
+{%- set entity = application.model.entities[entity_key] %}
+		{
+			"name": "{{ entity['entity_name'] }}",
+			"item": [
+				{
+					"name": "Get {{ entity['EntityName'] }}",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query {{ entity['EntityName'] }}($id: ID!) {\n     {{ entity['entityName'] }}(id: $id) {\n        id{{ macros.selection_fields(entity) }}\n    }\n}\n",
+								"variables": "{\n    \"id\": \"{{'{'}}{last{{ entity['EntityName'] }}Id}}\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{'{{'}}{{ project-name }}-endpoint}}",
+							"host": [
+								"{{'{{'}}{{ project-name }}-endpoint}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Create {{ entity['EntityName'] }}",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code == 200) {",
+									"    let last{{ entity['EntityName'] }}Id = JSON.parse(pm.response.text()).data.create{{ entity['EntityName'] }}.id;",
+									"    pm.environment.set(\"last{{ entity['EntityName'] }}Id\", last{{ entity['EntityName'] }}Id);",
+									"}",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.set('randomAge', Math.floor(Math.random() * 100));"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation Create{{ entity['EntityName'] }}(${{ entity['entityName'] }}Input: {{ entity['EntityName'] }}Input!) {\n    create{{ entity['EntityName'] }}( {{ entity['entityName'] }}: ${{ entity['entityName'] }}Input) {\n        id{{ macros.selection_fields(entity) }}\n    }\n}\n",
+								"variables": "{\n    \"{{ entity['entityName'] }}Input\": {{'{'}}{{ macros.input_fields(entity) }}\n    }\n}"
+							}
+						},
+						"url": {
+							"raw": "{{'{{'}}{{ project-name }}-endpoint}}",
+							"host": [
+								"{{'{{'}}{{ project-name }}-endpoint}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Update {{ entity['EntityName'] }}",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.set('randomAge', Math.floor(Math.random() * 100));"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation Update{{ entity['EntityName'] }}(${{ entity['entityName'] }}Input: {{ entity['EntityName'] }}Input!) {\n    update{{ entity['EntityName'] }}( {{ entity['entityName'] }}: ${{ entity['entityName'] }}Input) {\n        id{{ macros.selection_fields(entity) }}\n    }\n}\n",
+								"variables": "{\n    \"{{ entity['entityName'] }}Input\": {\n        \"id\": \"{{'{'}}{last{{ entity['EntityName'] }}Id}}\",{{ macros.input_fields(entity) }}\n    }\n}"
+							}
+						},
+						"url": {
+							"raw": "{{'{{'}}{{ project-name }}-endpoint}}",
+							"host": [
+								"{{'{{'}}{{ project-name }}-endpoint}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get {{ entity['EntityName'] }}",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query Get{{ entity['EntityName'] }}($id: ID!) {\n     {{ entity['entityName'] }}(id: $id) {\n        id{{ macros.selection_fields(entity) }}\n    }\n}",
+								"variables": "{\n    \"id\": \"{{'{'}}{last{{ entity['EntityName'] }}Id}}\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{'{{'}}{{ project-name }}-endpoint}}",
+							"host": [
+								"{{'{{'}}{{ project-name }}-endpoint}}"
+							]
+						}
+					}
+				}
+			]
+		}
+{%- endfor %}{% if not loop.last%},{% endif %}
+{%- endfor %}
+	]
+}

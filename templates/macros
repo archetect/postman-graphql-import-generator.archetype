@@ -1,0 +1,27 @@
+{%- macro selection_fields(entity) -%}
+{%- for field_key in entity.fields -%}
+{%- set field = entity.fields[field_key] -%}
+\n        {{ field["fieldName"] }}
+{%- endfor %}
+{%- endmacro -%}
+
+{%- macro input_field_value(field) %}
+{%- if field["type"] == "String" %}\"{{'{'}}{$randomCatchPhraseNoun}}\"
+{%- elif field["type"] == "I32" %}{{'{'}}{$randomInt}}
+{%- elif field["type"] == "I64" %}{{'{'}}{$randomInt}}
+{%- elif field["type"] == "F32" %}{{'{'}}{$randomInt}}
+{%- elif field["type"] == "F64" %}{{'{'}}{$randomInt}}
+{%- elif field["type"] == "Bool" %}{{'{'}}{$randomBoolean}}
+{%- elif field["type"] == "UUID" %}\"{{'{'}}{$guid}}\"
+{%- elif field["type"] == "Bytes" %}null
+{%- elif field["type"] == "DateTime" %}\"{{'{'}}{$isoTimestamp}}\"
+{%- else %}field["type"]
+{%- endif -%}
+{%- endmacro %}
+
+{%- macro input_fields(entity) -%}
+{%- for field_key in entity.fields -%}
+{%- set field = entity.fields[field_key] -%}
+\n        \"{{ field['fieldName'] }}\": {{ input_field_value(field) }}{% if not loop.last %},{% endif %}
+{%- endfor %}
+{%- endmacro -%}

@@ -1,0 +1,15 @@
+---
+description: "Postman GraphQL Import Generator"
+authors: ["Jimmie Fulton <jimmie.fulton@naxgrp.com>"]
+languages: []
+frameworks: []
+tags: []
+
+requires:
+  archetect: "2.0.0-ALPHA.18"
+
+components:
+  model-casing: https://github.com/archetect/archetect-model-casing.archetype.git
+
+templating:
+  undefined_behavior: Lenient
