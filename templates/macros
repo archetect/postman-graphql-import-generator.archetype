@@ -1,7 +1,7 @@
-{%- macro selection_fields(entity) -%}
+{%- macro selection_fields(entity, spacing) -%}
 {%- for field_key in entity.fields -%}
 {%- set field = entity.fields[field_key] -%}
-\n        {{ field["fieldName"] }}
+\n{{ spacing }}{{ field["fieldName"] }}
 {%- endfor %}
 {%- endmacro -%}
 
